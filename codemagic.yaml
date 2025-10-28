@@ -1,11 +1,6 @@
 workflows: 
   android-workflow:
     scripts:
-      - name: Build APK and test APK
-        script: |
-          ./gradlew app:assembleAndroidTest
-          ./gradlew app:assembleDebug
-
       - name: Run tests on Firebase Test Lab
         script: |
           echo $GCLOUD_KEY_FILE > ./gcloud_key_file.json
@@ -18,4 +13,5 @@ workflows:
             --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
             --device model=Pixel2,version=28 \
             --timeout 3m
+
 
