@@ -1,5 +1,8 @@
 workflows: 
   android-workflow:
+    environment:
+      groups: 
+        - firebase_credentials 
     scripts:
       - name: Run tests on Firebase Test Lab
         script: |
@@ -13,5 +16,6 @@ workflows:
             --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
             --device model=Pixel2,version=28 \
             --timeout 3m
+
 
 
