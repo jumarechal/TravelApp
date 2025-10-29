@@ -5,6 +5,11 @@ workflows:
       groups: 
         - firebase_credentials 
     scripts:
+      - name: Installing dependencies
+          script: | 
+            flutter packages pub get
+            flutter config --enable-web
+            flutter config --enable-macos-desktop
       - name: Create debug and test APK
         script: | 
           set -ex
@@ -23,6 +28,7 @@ workflows:
             --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
             --device model=Pixel3,version=30 \
             --timeout 3m
+
 
 
 
