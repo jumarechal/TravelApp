@@ -5,6 +5,10 @@ workflows:
       groups: 
         - firebase_credentials 
     scripts:
+      - name: Nettoyage de l'environment
+        script: |
+            cd hello_world
+            flutter clean 
       - name: Set up local.properties
         script: | 
             echo "flutter.sdk=$HOME/programs/flutter" > "hello_world/android/local.properties"
@@ -12,10 +16,6 @@ workflows:
         script: | 
             cd hello_world
             flutter pub get
-      - name: Nettoyage de l'environment
-        script: |
-            cd hello_world
-            flutter clean 
       - name: Create debug and test APK
         script: | 
           set -ex
