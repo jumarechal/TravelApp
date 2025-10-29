@@ -11,8 +11,6 @@ workflows:
       - name: Installing dependencies
         script: | 
             flutter pub get
-            flutter config --enable-web
-            flutter config --enable-macos-desktop
       - name: Create debug and test APK
         script: | 
           set -ex
