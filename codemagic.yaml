@@ -18,6 +18,16 @@ workflows:
           cd hello_world/android
           ./gradlew app:assembleAndroidTest
           ./gradlew app:assembleDebug 
+      - name: Vérifier la présence des APK
+        script: |
+          ls -l android/app/build/outputs/flutter-apk/
+          ls -l android/app/build/outputs/apk/androidTest/debug/
+          ls -l hello_world/android/app/build/outputs/flutter-apk/
+          ls -l hello_world/android/app/build/outputs/apk/androidTest/debug/
+          ls -l build/app/outputs/apk/debug/
+          ls -l hello_world/build/app/outputs/apk/debug/
+          ls -l build/app/outputs/apk/androidTest/debug/
+          ls -l hello_world/build/app/outputs/apk/androidTest/debug/
       - name: Run tests on Firebase Test Lab
         script: |
           echo $GCLOUD_KEY_FILE > ./gcloud_key_file.json
