@@ -10,6 +10,7 @@ workflows:
             echo "flutter.sdk=$HOME/programs/flutter" > "hello_world/android/local.properties"
       - name: Installing dependencies
         script: | 
+            cd hello_world
             flutter pub get
       - name: Create debug and test APK
         script: | 
