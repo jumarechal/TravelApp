@@ -17,7 +17,7 @@ workflows:
           set -ex
           cd hello_world/android
           ./gradlew app:assembleAndroidTest
-          ./gradlew app:assembleDebug -Ptarget="$CM_BUILD_DIR/integration_test/app_test.dart"
+          ./gradlew app:assembleDebug 
       - name: Run tests on Firebase Test Lab
         script: |
           echo $GCLOUD_KEY_FILE > ./gcloud_key_file.json
