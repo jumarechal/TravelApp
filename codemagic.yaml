@@ -1,0 +1,39 @@
+workflows: 
+  android-workflow:
+    environment:
+      flutter: stable 
+      groups: 
+        - firebase_credentials 
+    scripts:
+      - name: Installing dependencies
+        script: | 
+            flutter packages pub get
+            flutter config --enable-web
+            flutter config --enable-macos-desktop
+      - name: Create debug and test APK
+        script: | 
+          set -ex
+          cd hello_world/android
+          ./gradlew app:assembleAndroidTest
+          ./gradlew app:assembleDebug -Ptarget="$CM_BUILD_DIR/integration_test/app_test.dart"
+      - name: Run tests on Firebase Test Lab
+        script: |
+          echo $GCLOUD_KEY_FILE > ./gcloud_key_file.json
+          gcloud auth activate-service-account --key-file=gcloud_key_file.json
+          gcloud config set project $FIREBASE_PROJECT
+
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app build/app/outputs/apk/debug/app-debug.apk \
+            --test build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+            --device model=Pixel3,version=30 \
+            --timeout 3m
+
+
+
+
+
+
+
+
+
