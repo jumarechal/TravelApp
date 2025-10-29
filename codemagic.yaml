@@ -13,7 +13,9 @@ workflows:
             cd hello_world
             flutter pub get
       - name: Nettoyage de l'environment
-        script: flutter clean 
+        script: |
+            cd hello_world
+            flutter clean 
       - name: Create debug and test APK
         script: | 
           set -ex
