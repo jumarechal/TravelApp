@@ -26,7 +26,7 @@ class FranceMap extends StatelessWidget {
             width: 40,
             height: 40,
             point: LatLng(place.lat, place.lng),
-            builder: (ctx) => Icon(Icons.location_on, color: Colors.red, size: 32),
+            builder: (ctx) => Icon(Icons.push_pin, color: Colors.red, size: 36),
           )).toList(),
         ),
       ],
