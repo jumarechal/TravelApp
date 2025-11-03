@@ -22,7 +22,7 @@ workflows:
           cd hello_world/android
           ./gradlew app:assembleDebug 
     artifacts:
-      hello_world/build/app/outputs/apk/debug/app-debug.apk
+      - hello_world/build/app/outputs/apk/debug/app-debug.apk
 
 
 
