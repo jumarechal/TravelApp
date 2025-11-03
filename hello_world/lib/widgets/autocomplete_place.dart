@@ -29,16 +29,53 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
     final List<dynamic> jsonResult = json.decode(data);
     setState(() {
       _allPlaces = jsonResult.map((e) => Place.fromJson(e)).toList();
+      _filteredPlaces = []; // pas de filtrage au départ
     });
   }
 
   void onSearch(String input) {
+    if (input.isEmpty) {
+      setState(() {
+        _filteredPlaces = [];
+        _selectedPlace = null;
+      });
+      return;
+    }
+    final filtered = _allPlaces
+        .where((place) => place.name.toLowerCase().startsWith(input.toLowerCase()))
+        .toList();
+
     setState(() {
-      _filteredPlaces = _allPlaces
-          .where((place) => place.name.toLowerCase().contains(input.toLowerCase()))
-          .toList();
-      _selectedPlace = null; // reset selection on each new input
+      _filteredPlaces = filtered;
+      _selectedPlace = null;
     });
+  }
+
+  void _selectPlace(Place place) {
+    setState(() {
+      _controller.text = place.name;
+      _selectedPlace = place;
+      _filteredPlaces = [];
+    });
+  }
+
+  void _onAdd() {
+    Place? selected = _selectedPlace;
+    if (selected == null) {
+      // Recherche correspondance exacte (case-insensitive)
+      final exactMatches = _allPlaces.where(
+          (place) => place.name.toLowerCase() == _controller.text.toLowerCase());
+      if (exactMatches.isNotEmpty) selected = exactMatches.first;
+    }
+
+    if (selected != null) {
+      widget.onPlaceSelected(selected);
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ville non reconnue – veuillez sélectionner une ville dans la liste")),
+      );
+    }
   }
 
   @override
@@ -49,13 +86,13 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-              controller: _controller,
-              decoration: InputDecoration(hintText: 'Commence à taper une ville…'),
-              onChanged: onSearch
+            controller: _controller,
+            decoration: InputDecoration(hintText: 'Commencez à taper une ville…'),
+            onChanged: onSearch,
           ),
           SizedBox(height: 8),
           if (_filteredPlaces.isNotEmpty)
-            SizedBox(
+            Container(
               height: 150,
               child: ListView.builder(
                 itemCount: _filteredPlaces.length,
@@ -63,40 +100,14 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
                   final place = _filteredPlaces[index];
                   return ListTile(
                     title: Text(place.name),
-                    onTap: () {
-                      setState(() {
-                        _controller.text = place.name;
-                        _selectedPlace = place;
-                        _filteredPlaces = [];
-                      });
-                    },
+                    onTap: () => _selectPlace(place),
                   );
                 },
               ),
             ),
           SizedBox(height: 8),
           ElevatedButton(
-            onPressed: () {
-              // Si une ville a été sélectionnée dans la liste, prends son lat/lng
-              // Sinon, essaie de matcher le nom saisi manuellement
-              Place? selected = _selectedPlace;
-              if (selected == null) {
-                // Recherche par nom exact
-                final matches = _allPlaces
-                  .where((place) => place.name.toLowerCase() == _controller.text.toLowerCase())
-                  .toList();
-                if (matches.isNotEmpty) selected = matches.first;
-              }
-              if (selected != null) {
-                widget.onPlaceSelected(selected);
-                Navigator.pop(context);
-              } else {
-                // Optionnel : afficher une alerte ou un message d’erreur
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Ville non reconnue – sélectionnez dans la liste"))
-                );
-              }
-            },
+            onPressed: _onAdd,
             child: Text('Ajouter'),
           ),
         ],
