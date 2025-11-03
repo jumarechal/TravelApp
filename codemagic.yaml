@@ -3,7 +3,7 @@ workflows:
     environment:
       flutter: stable 
       groups: 
-        - firebase_credentials 
+        - lambdatest_credentials 
     scripts:
       - name: Nettoyage de l'environment
         script: |
@@ -21,6 +21,11 @@ workflows:
           set -ex
           cd hello_world/android
           ./gradlew app:assembleDebug 
+      - name: Upload and test on LambdaTest
+        script: |
+          curl -u $LAMBDATEST_USERNAME:$LAMBDATEST_ACCESS_KEY \
+            -F "file=hello_world/build/app/outputs/apk/debug/app-debug.apk" \
+            https://api.lambdatest.com/app-automation/upload
     artifacts:
       - hello_world/build/app/outputs/apk/debug/app-debug.apk
 
