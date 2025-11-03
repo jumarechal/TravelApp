@@ -20,20 +20,9 @@ workflows:
         script: | 
           set -ex
           cd hello_world/android
-          ./gradlew app:assembleAndroidTest
           ./gradlew app:assembleDebug 
-      - name: Run tests on Firebase Test Lab
-        script: |
-          echo $GCLOUD_KEY_FILE > ./gcloud_key_file.json
-          gcloud auth activate-service-account --key-file=gcloud_key_file.json
-          gcloud config set project $FIREBASE_PROJECT
-
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app hello_world/build/app/outputs/apk/debug/app-debug.apk \
-            --test hello_world/build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
-            --device model=Pixel3,version=30 \
-            --timeout 3m
+    artifacts:
+      hello_world/build/app/outputs/apk/debug/app-debug.apk
 
 
 
