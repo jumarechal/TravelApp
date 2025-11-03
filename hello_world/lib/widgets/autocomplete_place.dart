@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
-import '../models/place.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 
-class AutocompletePlace extends StatefulWidget {
-  final Function(Place) onPlaceSelected;
-
-  AutocompletePlace({required this.onPlaceSelected});
-
+class TestAutocomplete extends StatefulWidget {
   @override
-  _AutocompletePlaceState createState() => _AutocompletePlaceState();
+  _TestAutocompleteState createState() => _TestAutocompleteState();
 }
 
-class _AutocompletePlaceState extends State<AutocompletePlace> {
-  final TextEditingController _controller = TextEditingController();
-  List<Place> _allPlaces = [];
-  List<Place> _filteredPlaces = [];
-  Place? _selectedPlace;
+class _TestAutocompleteState extends State<TestAutocomplete> {
+  List<Map<String, dynamic>> _allCities = [];
+  List<Map<String, dynamic>> _filteredCities = [];
 
   @override
   void initState() {
@@ -28,87 +21,40 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
     final data = await rootBundle.loadString('data/cities_france.json');
     final List<dynamic> jsonResult = json.decode(data);
     setState(() {
-      _allPlaces = jsonResult.map((e) => Place.fromJson(e)).toList();
-      _filteredPlaces = []; // pas de filtrage au départ
+      _allCities = jsonResult.cast<Map<String, dynamic>>();
     });
+    print('Chargement des villes: ${_allCities.length}'); // DEBUG
   }
 
-  void onSearch(String input) {
-    if (input.isEmpty) {
-      setState(() {
-        _filteredPlaces = [];
-        _selectedPlace = null;
-      });
-      return;
-    }
-    final filtered = _allPlaces
-        .where((place) => place.name.toLowerCase().startsWith(input.toLowerCase()))
-        .toList();
+  void filterCities(String input) {
+    final filtered = _allCities.where((city) {
+      return city['name'].toString().toLowerCase().startsWith(input.toLowerCase());
+    }).toList();
 
     setState(() {
-      _filteredPlaces = filtered;
-      _selectedPlace = null;
+      _filteredCities = filtered;
     });
-  }
-
-  void _selectPlace(Place place) {
-    setState(() {
-      _controller.text = place.name;
-      _selectedPlace = place;
-      _filteredPlaces = [];
-    });
-  }
-
-  void _onAdd() {
-    Place? selected = _selectedPlace;
-    if (selected == null) {
-      // Recherche correspondance exacte (case-insensitive)
-      final exactMatches = _allPlaces.where(
-          (place) => place.name.toLowerCase() == _controller.text.toLowerCase());
-      if (exactMatches.isNotEmpty) selected = exactMatches.first;
-    }
-
-    if (selected != null) {
-      widget.onPlaceSelected(selected);
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Ville non reconnue – veuillez sélectionner une ville dans la liste")),
-      );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Ajouter un lieu de couchage'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
+    return Scaffold(
+      appBar: AppBar(title: Text('Test Autocomplete')),
+      body: Column(
         children: [
           TextField(
-            controller: _controller,
-            decoration: InputDecoration(hintText: 'Commencez à taper une ville…'),
-            onChanged: onSearch,
+            onChanged: filterCities,
+            decoration: InputDecoration(hintText: 'Tapez une ville'),
           ),
-          SizedBox(height: 8),
-          if (_filteredPlaces.isNotEmpty)
-            Container(
-              height: 150,
-              child: ListView.builder(
-                itemCount: _filteredPlaces.length,
-                itemBuilder: (context, index) {
-                  final place = _filteredPlaces[index];
-                  return ListTile(
-                    title: Text(place.name),
-                    onTap: () => _selectPlace(place),
-                  );
-                },
-              ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _filteredCities.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_filteredCities[index]['name']),
+                );
+              },
             ),
-          SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: _onAdd,
-            child: Text('Ajouter'),
           ),
         ],
       ),
