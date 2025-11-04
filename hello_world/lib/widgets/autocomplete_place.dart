@@ -56,7 +56,6 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Ville non reconnue. Veuillez vérifier l'orthographe.")),
       );
-      print("BANANA");
     }
   }
 
