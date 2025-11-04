@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
+import '../models/place.dart';
+
+
+class AutocompletePlace extends StatefulWidget {
+  final Function(Place) onPlaceSelected;
+
+  AutocompletePlace({required this.onPlaceSelected});
+  
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    throw UnimplementedError();
+  }
+}
 
 class TestAutocomplete extends StatefulWidget {
   @override
