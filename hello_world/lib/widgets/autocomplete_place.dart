@@ -23,11 +23,12 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
   }
 
   Future<void> loadCities() async {
-    final data = await rootBundle.loadString('data/cities_france.json');
+    final data = await rootBundle.loadString('lib/data/cities_france.json');
     final List<dynamic> jsonResult = json.decode(data);
     setState(() {
       _allPlaces = jsonResult.map((e) => Place.fromJson(e)).toList();
     });
+    print("Villes chargées: ${_allPlaces.map((e) => e.name).toList()}");
   }
 
   void _onAdd() {
@@ -55,6 +56,7 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Ville non reconnue. Veuillez vérifier l'orthographe.")),
       );
+      print("BANANA");
     }
   }
 
