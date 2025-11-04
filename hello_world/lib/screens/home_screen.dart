@@ -58,7 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 await showDialog(
                   context: context,
-                  builder: (context) => TestAutocomplete(),
+                  builder: (context) => AutocompletePlace(
+                    onPlaceSelected: (Place ) {  },),
                 );
               },
             ),

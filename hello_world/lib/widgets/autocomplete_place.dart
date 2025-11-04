@@ -1,29 +1,20 @@
 import 'package:flutter/material.dart';
+import '../models/place.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
-import '../models/place.dart';
-
 
 class AutocompletePlace extends StatefulWidget {
   final Function(Place) onPlaceSelected;
 
   AutocompletePlace({required this.onPlaceSelected});
-  
+
   @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
+  _AutocompletePlaceState createState() => _AutocompletePlaceState();
 }
 
-class TestAutocomplete extends StatefulWidget {
-  @override
-  _TestAutocompleteState createState() => _TestAutocompleteState();
-}
-
-class _TestAutocompleteState extends State<TestAutocomplete> {
-  List<Map<String, dynamic>> _allCities = [];
-  List<Map<String, dynamic>> _filteredCities = [];
+class _AutocompletePlaceState extends State<AutocompletePlace> {
+  final TextEditingController _controller = TextEditingController();
+  List<Place> _allPlaces = [];
 
   @override
   void initState() {
@@ -35,40 +26,53 @@ class _TestAutocompleteState extends State<TestAutocomplete> {
     final data = await rootBundle.loadString('data/cities_france.json');
     final List<dynamic> jsonResult = json.decode(data);
     setState(() {
-      _allCities = jsonResult.cast<Map<String, dynamic>>();
+      _allPlaces = jsonResult.map((e) => Place.fromJson(e)).toList();
     });
-    print('Chargement des villes: ${_allCities.length}'); // DEBUG
   }
 
-  void filterCities(String input) {
-    final filtered = _allCities.where((city) {
-      return city['name'].toString().toLowerCase().startsWith(input.toLowerCase());
-    }).toList();
+  void _onAdd() {
+    String enteredCity = _controller.text.trim();
+    if (enteredCity.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Veuillez saisir un nom de ville")),
+      );
+      return;
+    }
 
-    setState(() {
-      _filteredCities = filtered;
-    });
+    Place? selected;
+    try {
+      selected = _allPlaces.firstWhere(
+        (place) => place.name.toLowerCase() == enteredCity.toLowerCase(),
+      );
+    } catch (e) {
+      selected = null;
+    }
+
+    if (selected != null) {
+      widget.onPlaceSelected(selected);
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ville non reconnue. Veuillez vérifier l'orthographe.")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Test Autocomplete')),
-      body: Column(
+    return AlertDialog(
+      title: Text('Ajouter un lieu de couchage'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            onChanged: filterCities,
-            decoration: InputDecoration(hintText: 'Tapez une ville'),
+            controller: _controller,
+            decoration: InputDecoration(hintText: 'Saisissez une ville en France'),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filteredCities.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_filteredCities[index]['name']),
-                );
-              },
-            ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _onAdd,
+            child: Text('Ajouter'),
           ),
         ],
       ),
