@@ -28,7 +28,6 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
     setState(() {
       _allPlaces = jsonResult.map((e) => Place.fromJson(e)).toList();
     });
-    print("Villes chargées: ${_allPlaces.map((e) => e.name).toList()}");
   }
 
   void _onAdd() {
@@ -43,8 +42,7 @@ class _AutocompletePlaceState extends State<AutocompletePlace> {
     Place? selected;
     try {
       selected = _allPlaces.firstWhere(
-        (place) => place.name.toLowerCase() == enteredCity.toLowerCase(),
-      );
+          (place) => place.name.toLowerCase() == enteredCity.toLowerCase());
     } catch (e) {
       selected = null;
     }
